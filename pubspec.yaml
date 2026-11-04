@@ -1,0 +1,28 @@
+name: stack_tower
+description: Stack Tower - a simple, addictive tap-timing game.
+publish_to: "none"
+version: 1.0.3+4
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_mobile_ads: ^9.2.0
+  shared_preferences: ^2.5.6
+  # shared_preferences, google_mobile_ads aur flutter_launcher_icons
+  # `dart tool/setup.dart` khud add kar deta hai (latest compatible version).
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon.png"
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
