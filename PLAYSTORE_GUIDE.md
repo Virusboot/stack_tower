@@ -3,7 +3,7 @@
 ## 🚀 App Status: BUILD & PUBLISH READY
 
 - **Application ID / Package Name:** `com.stacktower.casual.game`
-- **Current Version:** `1.0.4+5` (Build 5 - Immersive, Dynamic Themes, Dual Score & Rewarded Revive)
+- **Current Version:** `1.0.5+6` (Build 6 - Auto-Retry Ads, AD_ID Permission, Persistent Interstitial Tracking)
 - **Min SDK:** 23 (Android 6.0+)
 - **Target SDK:** 34 / 35 (Latest Android)
 - **Release Bundle (.aab):** `build/app/outputs/bundle/release/app-release.aab`

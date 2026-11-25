@@ -130,6 +130,7 @@ class _StackGameState extends State<StackGame>
   int worldBest = SecurityService.kInitialWorldRecord;
   int combo = 0;
   int gameOvers = 0;
+  int _outsSinceLastAd = 0;
   bool over = false;
   bool soundOn = true;
   bool _isRestarting = false;
@@ -391,6 +392,7 @@ class _StackGameState extends State<StackGame>
     _showingRevivePrompt = false;
     _overAt = DateTime.now();
     gameOvers++;
+    _outsSinceLastAd++;
 
     // Update Personal Best securely
     if (score > best) {
@@ -449,18 +451,25 @@ class _StackGameState extends State<StackGame>
       HapticFeedback.mediumImpact();
     } catch (_) {}
 
-    // Policy-safe interstitial: every 3 game overs with 40s cooldown
-    if (gameOvers > 0 && gameOvers % 3 == 0) {
-      AdService.showInterstitial(onComplete: () {
-        if (mounted) {
-          _reset(fullReset: true);
-          _isRestarting = false;
-        }
-      });
-    } else {
-      _reset(fullReset: true);
-      _isRestarting = false;
+    // Show interstitial every 3 outs. If ad is loaded, show it and reset counter.
+    // If not ready yet, keep counter >= 3 and request ad so next death triggers it.
+    if (_outsSinceLastAd >= 3) {
+      if (AdService.isInterstitialLoaded) {
+        AdService.showInterstitial(onComplete: () {
+          _outsSinceLastAd = 0;
+          if (mounted) {
+            _reset(fullReset: true);
+            _isRestarting = false;
+          }
+        });
+        return;
+      } else {
+        AdService.prepareInterstitial();
+      }
     }
+
+    _reset(fullReset: true);
+    _isRestarting = false;
   }
 
   Future<void> _toggleSound() async {
@@ -514,7 +523,7 @@ class _StackGameState extends State<StackGame>
                   Text('• Privacy Policy: virusboot.github.io/stack_tower/privacy_policy.html',
                       style: TextStyle(color: Colors.white60, fontSize: 12)),
                   SizedBox(height: 6),
-                  Text('• Version: 1.0.4 (Build 5)',
+                  Text('• Version: 1.0.5 (Build 6)',
                       style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
