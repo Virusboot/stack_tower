@@ -3,22 +3,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// ====== PLAY STORE SE PEHLE YAHAN APNI REAL ADMOB IDs DAALO ======
-/// Debug mode (flutter run) me hamesha Google ke TEST ads chalte hain.
-/// Release build (Play Store wali) me neeche ki real IDs use hoti hain.
+/// ====== REAL ADMOB IDs FOR PRODUCTION ======
 const String kRealBannerId = 'ca-app-pub-6236208130146050/4185598419';
 const String kRealInterstitialId = 'ca-app-pub-6236208130146050/1176291697';
-/// ================================================================
+// Rewarded ad unit ID (Fallback to Google verified test ID if unit not yet created in AdMob console)
+const String kRealRewardedId = 'ca-app-pub-3940256099942544/5224354917';
+/// ==========================================
 
 const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
 const String _testInterstitialId = 'ca-app-pub-3940256099942544/1033173712';
+const String _testRewardedId = 'ca-app-pub-3940256099942544/5224354917';
 
 class AdService {
   static String get bannerId => kDebugMode ? _testBannerId : kRealBannerId;
   static String get interstitialId =>
       kDebugMode ? _testInterstitialId : kRealInterstitialId;
+  static String get rewardedId =>
+      kDebugMode ? _testRewardedId : kRealRewardedId;
 
   static InterstitialAd? _inter;
+  static RewardedAd? _rewarded;
+  static bool _isLoadingRewarded = false;
   static DateTime _lastInterstitialTime =
       DateTime.fromMillisecondsSinceEpoch(0);
   static Future<InitializationStatus>? _initFuture;
@@ -27,13 +32,15 @@ class AdService {
     try {
       _initFuture ??= MobileAds.instance.initialize();
       await _initFuture;
-      _load();
+      _loadInterstitial();
+      _loadRewarded();
     } catch (e) {
-      debugPrint('Ads init failed gracefully: $e');
+      debugPrint('[AdService] Init error: $e');
     }
   }
 
-  static void _load() {
+  // ==================== INTERSTITIAL ADS ====================
+  static void _loadInterstitial() {
     try {
       InterstitialAd.load(
         adUnitId: interstitialId,
@@ -41,31 +48,29 @@ class AdService {
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) => _inter = ad,
           onAdFailedToLoad: (error) {
-            debugPrint('Interstitial failed to load: $error');
+            debugPrint('[AdService] Interstitial load failed: $error');
             _inter = null;
           },
         ),
       );
     } catch (e) {
-      debugPrint('Error initiating interstitial load: $e');
+      debugPrint('[AdService] Interstitial load error: $e');
       _inter = null;
     }
   }
 
-  /// Policy-safe interstitial display:
-  /// 1. Cooldown of 45 seconds to comply with Google Better Ads Standards.
-  /// 2. onComplete callback so game does not run in background while ad is showing.
+  /// Policy-safe interstitial display with 40-second cooldown
   static void showInterstitial({VoidCallback? onComplete}) {
     try {
       final now = DateTime.now();
-      if (now.difference(_lastInterstitialTime).inSeconds < 45) {
+      if (now.difference(_lastInterstitialTime).inSeconds < 40) {
         onComplete?.call();
         return;
       }
 
       final ad = _inter;
       if (ad == null) {
-        _load();
+        _loadInterstitial();
         onComplete?.call();
         return;
       }
@@ -77,26 +82,102 @@ class AdService {
           try {
             a.dispose();
           } catch (_) {}
-          _load();
+          _loadInterstitial();
           onComplete?.call();
         },
         onAdFailedToShowFullScreenContent: (a, error) {
-          debugPrint('Interstitial failed to show: $error');
+          debugPrint('[AdService] Interstitial show failed: $error');
           try {
             a.dispose();
           } catch (_) {}
-          _load();
+          _loadInterstitial();
           onComplete?.call();
         },
       );
       ad.show();
     } catch (e) {
-      debugPrint('Error showing interstitial: $e');
+      debugPrint('[AdService] Error showing interstitial: $e');
       onComplete?.call();
     }
   }
+
+  // ==================== REWARDED ADS (MAX REVENUE) ====================
+  static bool get isRewardedAvailable => _rewarded != null;
+
+  static void _loadRewarded() {
+    if (_isLoadingRewarded || _rewarded != null) return;
+    _isLoadingRewarded = true;
+
+    try {
+      RewardedAd.load(
+        adUnitId: rewardedId,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            _rewarded = ad;
+            _isLoadingRewarded = false;
+          },
+          onAdFailedToLoad: (error) {
+            debugPrint('[AdService] Rewarded ad failed to load: $error');
+            _rewarded = null;
+            _isLoadingRewarded = false;
+          },
+        ),
+      );
+    } catch (e) {
+      debugPrint('[AdService] Rewarded ad load error: $e');
+      _rewarded = null;
+      _isLoadingRewarded = false;
+    }
+  }
+
+  /// Shows Rewarded Video ad to grant player a game revive.
+  /// Generates highest eCPM with 100% user-opt-in policy safety.
+  static void showRewardedAd({
+    required VoidCallback onRewardEarned,
+    VoidCallback? onDismissed,
+  }) {
+    final ad = _rewarded;
+    if (ad == null) {
+      _loadRewarded();
+      onDismissed?.call();
+      return;
+    }
+
+    _rewarded = null;
+    bool rewardGranted = false;
+
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (a) {
+        try {
+          a.dispose();
+        } catch (_) {}
+        _loadRewarded();
+        if (rewardGranted) {
+          onRewardEarned();
+        } else {
+          onDismissed?.call();
+        }
+      },
+      onAdFailedToShowFullScreenContent: (a, error) {
+        debugPrint('[AdService] Rewarded ad show failed: $error');
+        try {
+          a.dispose();
+        } catch (_) {}
+        _loadRewarded();
+        onDismissed?.call();
+      },
+    );
+
+    ad.show(
+      onUserEarnedReward: (AdWithoutView adView, RewardItem reward) {
+        rewardGranted = true;
+      },
+    );
+  }
 }
 
+// ==================== BANNER AD CONTAINER ====================
 class BannerBox extends StatefulWidget {
   const BannerBox({super.key});
 
@@ -116,7 +197,6 @@ class _BannerBoxState extends State<BannerBox> {
 
   Future<void> _loadBanner() async {
     try {
-      // Ensure SDK initialization is complete before loading banner
       await AdService.init();
       if (!mounted) return;
 
@@ -129,7 +209,7 @@ class _BannerBoxState extends State<BannerBox> {
             if (mounted) setState(() => _loaded = true);
           },
           onAdFailedToLoad: (ad, error) {
-            debugPrint('BannerAd failed to load: $error');
+            debugPrint('[AdService] BannerAd failed: $error');
             try {
               ad.dispose();
             } catch (_) {}
@@ -146,7 +226,7 @@ class _BannerBoxState extends State<BannerBox> {
       _ad = banner;
       await banner.load();
     } catch (e) {
-      debugPrint('BannerBox error: $e');
+      debugPrint('[AdService] BannerBox error: $e');
       if (mounted) {
         setState(() {
           _loaded = false;
@@ -174,9 +254,19 @@ class _BannerBoxState extends State<BannerBox> {
     }
     return Container(
       alignment: Alignment.center,
-      width: ad.size.width.toDouble(),
-      height: 50,
-      child: AdWidget(ad: ad),
+      width: double.infinity,
+      height: 52,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F1225).withAlpha(180),
+        border: const Border(
+          top: BorderSide(color: Colors.white12, width: 1),
+        ),
+      ),
+      child: SizedBox(
+        width: ad.size.width.toDouble(),
+        height: ad.size.height.toDouble(),
+        child: AdWidget(ad: ad),
+      ),
     );
   }
 }

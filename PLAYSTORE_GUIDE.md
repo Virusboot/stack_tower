@@ -3,7 +3,7 @@
 ## 🚀 App Status: BUILD & PUBLISH READY
 
 - **Application ID / Package Name:** `com.stacktower.casual.game`
-- **Current Version:** `1.0.3+4` (Build 4 - Production Ready)
+- **Current Version:** `1.0.4+5` (Build 5 - Immersive, Dynamic Themes, Dual Score & Rewarded Revive)
 - **Min SDK:** 23 (Android 6.0+)
 - **Target SDK:** 34 / 35 (Latest Android)
 - **Release Bundle (.aab):** `build/app/outputs/bundle/release/app-release.aab`
