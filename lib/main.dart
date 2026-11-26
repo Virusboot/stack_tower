@@ -549,7 +549,7 @@ class _StackGameState extends State<StackGame>
                   Text('• Privacy Policy: virusboot.github.io/stack_tower/privacy_policy.html',
                       style: TextStyle(color: Colors.white60, fontSize: 12)),
                   SizedBox(height: 6),
-                  Text('• Version: 1.0.7 (Build 8)',
+                  Text('• Version: 1.0.8 (Build 9)',
                       style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),

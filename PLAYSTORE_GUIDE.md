@@ -3,7 +3,7 @@
 ## 🚀 App Status: BUILD & PUBLISH READY
 
 - **Application ID / Package Name:** `com.stacktower.casual.game`
-- **Current Version:** `1.0.7+8` (Build 8 - Verified Google Play Linked AdMob IDs & Play Games Leaderboard)
+- **Current Version:** `1.0.8+9` (Build 9 - Complete Monetization with Banner, Interstitial & Rewarded Revive Ads)
 - **Min SDK:** 23 (Android 6.0+)
 - **Target SDK:** 34 / 35 (Latest Android)
 - **Release Bundle (.aab):** `build/app/outputs/bundle/release/app-release.aab`
@@ -47,6 +47,7 @@ Your real AdMob IDs have been integrated into the project:
 - **AdMob App ID:** `ca-app-pub-6236208130146050~3991023262` (in `android/app/src/main/AndroidManifest.xml`)
 - **Banner Ad Unit ID:** `ca-app-pub-6236208130146050/9403132041` (in `lib/ads.dart`)
 - **Interstitial Ad Unit ID:** `ca-app-pub-6236208130146050/8473193757` (in `lib/ads.dart`)
+- **Rewarded Ad Unit ID:** `ca-app-pub-6236208130146050/3333828976` (in `lib/ads.dart`)
 
 > 💡 **Notice:** Debug mode (`flutter run`) automatically uses Google's official Test Ads so your account is never flagged for self-clicks. Release builds (`flutter build appbundle --release`) use your real IDs above.
 

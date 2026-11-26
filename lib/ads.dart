@@ -7,7 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 /// ====== REAL ADMOB IDs FOR PRODUCTION (GOOGLE PLAY LINKED APP) ======
 const String kRealBannerId = 'ca-app-pub-6236208130146050/9403132041';
 const String kRealInterstitialId = 'ca-app-pub-6236208130146050/8473193757';
-const String kRealRewardedId = 'ca-app-pub-3940256099942544/5224354917';
+const String kRealRewardedId = 'ca-app-pub-6236208130146050/3333828976';
 /// ======================================================================
 
 const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
