@@ -4,11 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// ====== REAL ADMOB IDs FOR PRODUCTION ======
-const String kRealBannerId = 'ca-app-pub-6236208130146050/4185598419';
-const String kRealInterstitialId = 'ca-app-pub-6236208130146050/1176291697';
+/// ====== REAL ADMOB IDs FOR PRODUCTION (GOOGLE PLAY LINKED APP) ======
+const String kRealBannerId = 'ca-app-pub-6236208130146050/9403132041';
+const String kRealInterstitialId = 'ca-app-pub-6236208130146050/8473193757';
 const String kRealRewardedId = 'ca-app-pub-3940256099942544/5224354917';
-/// ==========================================
+/// ======================================================================
 
 const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
 const String _testInterstitialId = 'ca-app-pub-3940256099942544/1033173712';

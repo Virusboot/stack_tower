@@ -35,10 +35,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- Real AdMob App ID -->
+        <!-- Real AdMob App ID (Google Play Linked) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6236208130146050~6212995950"/>
+            android:value="ca-app-pub-6236208130146050~3991023262"/>
         <!-- Optimize AdMob initialization and loading off the main UI thread -->
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
