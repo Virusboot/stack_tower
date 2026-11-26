@@ -5,7 +5,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ads.dart';
-import 'play_games_service.dart';
 import 'security.dart';
 
 Future<void> main() async {
@@ -129,7 +128,6 @@ class _StackGameState extends State<StackGame>
   double baseW = 0, curX = 0, curW = 0, dir = 1, cam = 0, flash = 0;
   int best = 0;
   int worldBest = SecurityService.kInitialWorldRecord;
-  String? worldRecordHolder;
   int combo = 0;
   int gameOvers = 0;
   int _outsSinceLastAd = 0;
@@ -165,29 +163,10 @@ class _StackGameState extends State<StackGame>
     final int wb = await SecurityService.getSecureWorldRecord();
     final p = await SharedPreferences.getInstance();
 
-    // Initialize Google Play Games silent sign-in and fetch World Champion
-    PlayGamesService.init().then((_) {
-      if (mounted) {
-        final holder = PlayGamesService.topPlayerName ?? p.getString('st_wr_holder_name');
-        final pgsScore = PlayGamesService.topPlayerScore;
-        setState(() {
-          if (pgsScore != null && pgsScore >= worldBest) {
-            worldBest = pgsScore;
-          }
-          if (holder != null && holder.isNotEmpty) {
-            worldRecordHolder = holder;
-          }
-        });
-      }
-    });
-
-    final String? cachedHolder = p.getString('st_wr_holder_name');
-
     if (!mounted) return;
     setState(() {
       best = b;
       worldBest = wb;
-      worldRecordHolder = cachedHolder;
       soundOn = p.getBool('sound') ?? true;
     });
   }
@@ -422,13 +401,9 @@ class _StackGameState extends State<StackGame>
       SecurityService.saveSecureBestScore(best);
     }
 
-    // Submit score to Google Play Games Leaderboard
-    PlayGamesService.submitScore(score);
-
     // Update Worldwide Record securely if beaten
     if (score > worldBest) {
       worldBest = score;
-      worldRecordHolder = 'You';
       SecurityService.saveSecureWorldRecord(worldBest);
     }
 
@@ -549,7 +524,7 @@ class _StackGameState extends State<StackGame>
                   Text('• Privacy Policy: virusboot.github.io/stack_tower/privacy_policy.html',
                       style: TextStyle(color: Colors.white60, fontSize: 12)),
                   SizedBox(height: 6),
-                  Text('• Version: 1.0.8 (Build 9)',
+                  Text('• Version: 1.0.9 (Build 10)',
                       style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -702,24 +677,18 @@ class _StackGameState extends State<StackGame>
                                           height: 14,
                                           color: Colors.white24),
                                       const SizedBox(width: 12),
-                                      // Worldwide Record (Tap to view Google Play Games Leaderboard)
-                                      GestureDetector(
-                                        onTap: () => PlayGamesService.showLeaderboards(),
-                                        child: Row(
-                                          children: [
-                                            const Icon(Icons.public,
-                                                size: 14, color: Colors.amberAccent),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                                worldRecordHolder != null && worldRecordHolder!.isNotEmpty
-                                                    ? 'WORLD $worldBest ($worldRecordHolder)'
-                                                    : 'WORLD $worldBest',
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: Colors.amberAccent)),
-                                          ],
-                                        ),
+                                      // Worldwide Record
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.public,
+                                              size: 14, color: Colors.amberAccent),
+                                          const SizedBox(width: 4),
+                                          Text('WORLD $worldBest',
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.amberAccent)),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -1043,34 +1012,20 @@ class _StackGameState extends State<StackGame>
                                           width: 1,
                                           height: 30,
                                           color: Colors.white24),
-                                      GestureDetector(
-                                        onTap: () => PlayGamesService.showLeaderboards(),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Icon(Icons.emoji_events,
-                                                    size: 12, color: Colors.amberAccent),
-                                                const SizedBox(width: 3),
-                                                Text(
-                                                    worldRecordHolder != null && worldRecordHolder!.isNotEmpty
-                                                        ? 'WORLD (#1 $worldRecordHolder)'
-                                                        : 'WORLD',
-                                                    style: const TextStyle(
-                                                        fontSize: 11,
-                                                        color: Colors.amberAccent,
-                                                        fontWeight: FontWeight.bold)),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text('$worldBest',
-                                                style: const TextStyle(
-                                                    fontSize: 22,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.amberAccent)),
-                                          ],
-                                        ),
+                                      Column(
+                                        children: [
+                                          const Text('WORLD',
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.amberAccent,
+                                                  fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 4),
+                                          Text('$worldBest',
+                                              style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.amberAccent)),
+                                        ],
                                       ),
                                     ],
                                   ),

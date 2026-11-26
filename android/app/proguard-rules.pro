@@ -21,11 +21,8 @@
 # Google Play Services & Tasks
 -keep class com.google.android.gms.common.** { *; }
 -keep class com.google.android.gms.tasks.** { *; }
--keep class com.google.android.gms.games.** { *; }
--keep interface com.google.android.gms.games.** { *; }
 -dontwarn com.google.android.gms.common.**
 -dontwarn com.google.android.gms.tasks.**
--dontwarn com.google.android.gms.games.**
 
 # Application Packages
 -keep class com.stacktower.game.stack_tower.** { *; }
