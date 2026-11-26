@@ -21,12 +21,12 @@ class CloudRecordService {
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
         final dynamic data = json.decode(body);
-        if (data is int && data > 0) {
+        if (data is int && data >= 0) {
           debugPrint('[CloudRecord] Live world record fetched: $data');
           // Cache locally securely
           await SecurityService.saveSecureWorldRecord(data);
           return data;
-        } else if (data is num && data > 0) {
+        } else if (data is num && data >= 0) {
           final int val = data.toInt();
           await SecurityService.saveSecureWorldRecord(val);
           return val;
@@ -42,7 +42,7 @@ class CloudRecordService {
 
   /// Submits the new world record to Firebase Cloud so ALL users worldwide see it.
   static Future<void> submitNewRecord(int newScore) async {
-    if (newScore <= SecurityService.kInitialWorldRecord) return;
+    if (newScore <= 0) return;
 
     HttpClient? client;
     try {

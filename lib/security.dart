@@ -12,8 +12,8 @@ class SecurityService {
   static const String _worldHashKey = 'st_secure_wr_sig';
   static const String _salt = 'StackTower_AntiTamper_v1_Salt982741!';
 
-  // Baseline global record
-  static const int kInitialWorldRecord = 135;
+  // Baseline global record starts at 0
+  static const int kInitialWorldRecord = 0;
 
   /// Lightweight, deterministic hash function (FNV-1a 64-bit variant)
   /// ensuring 100% offline verification without third-party dependencies.
@@ -87,9 +87,10 @@ class SecurityService {
       }
 
       final String expectedSig = _generateSignature(stored, 'wr');
-      if (sig == expectedSig && stored >= kInitialWorldRecord) {
+      if (sig == expectedSig && stored >= 0 && stored < 100000) {
         return stored;
       } else {
+        await saveSecureWorldRecord(kInitialWorldRecord);
         return kInitialWorldRecord;
       }
     } catch (e) {

@@ -173,7 +173,7 @@ class _StackGameState extends State<StackGame>
 
     // Silently sync with Firebase Cloud in the background
     CloudRecordService.fetchWorldRecord().then((cloudScore) {
-      if (mounted && cloudScore != null && cloudScore > worldBest) {
+      if (mounted && cloudScore != null && cloudScore >= worldBest) {
         setState(() {
           worldBest = cloudScore;
         });
@@ -536,7 +536,7 @@ class _StackGameState extends State<StackGame>
                   Text('• Privacy Policy: virusboot.github.io/stack_tower/privacy_policy.html',
                       style: TextStyle(color: Colors.white60, fontSize: 12)),
                   SizedBox(height: 6),
-                  Text('• Version: 1.0.10 (Build 11)',
+                  Text('• Version: 1.0.11 (Build 12)',
                       style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),

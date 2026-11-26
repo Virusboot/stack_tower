@@ -3,7 +3,7 @@
 ## 🚀 App Status: BUILD & PUBLISH READY
 
 - **Application ID / Package Name:** `com.stacktower.casual.game`
-- **Current Version:** `1.0.10+11` (Build 11 - Firebase Cloud Worldwide Realtime High Score Sync)
+- **Current Version:** `1.0.11+12` (Build 12 - World Record starts at 0 & Realtime Auto-Increments Globally)
 - **Min SDK:** 23 (Android 6.0+)
 - **Target SDK:** 34 / 35 (Latest Android)
 - **Release Bundle (.aab):** `build/app/outputs/bundle/release/app-release.aab`
