@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ads.dart';
+import 'cloud_record_service.dart';
 import 'security.dart';
 
 Future<void> main() async {
@@ -168,6 +169,15 @@ class _StackGameState extends State<StackGame>
       best = b;
       worldBest = wb;
       soundOn = p.getBool('sound') ?? true;
+    });
+
+    // Silently sync with Firebase Cloud in the background
+    CloudRecordService.fetchWorldRecord().then((cloudScore) {
+      if (mounted && cloudScore != null && cloudScore > worldBest) {
+        setState(() {
+          worldBest = cloudScore;
+        });
+      }
     });
   }
 
@@ -405,6 +415,8 @@ class _StackGameState extends State<StackGame>
     if (score > worldBest) {
       worldBest = score;
       SecurityService.saveSecureWorldRecord(worldBest);
+      // Publish to Firebase Cloud so all players worldwide see it
+      CloudRecordService.submitNewRecord(worldBest);
     }
 
     setState(() {});
@@ -524,7 +536,7 @@ class _StackGameState extends State<StackGame>
                   Text('• Privacy Policy: virusboot.github.io/stack_tower/privacy_policy.html',
                       style: TextStyle(color: Colors.white60, fontSize: 12)),
                   SizedBox(height: 6),
-                  Text('• Version: 1.0.9 (Build 10)',
+                  Text('• Version: 1.0.10 (Build 11)',
                       style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
