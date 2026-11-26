@@ -1,7 +1,7 @@
 name: stack_tower
 description: Stack Tower - a simple, addictive tap-timing game.
 publish_to: "none"
-version: 1.0.5+6
+version: 1.0.6+7
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  games_services: ^5.3.0
   google_mobile_ads: ^9.2.0
   shared_preferences: ^2.5.6
   # shared_preferences, google_mobile_ads aur flutter_launcher_icons
